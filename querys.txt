@@ -1,0 +1,23 @@
+IF EXISTS (SELECT 1=1 FROM `producenter` WHERE `Fornamn` = p_Fornamn AND `Efternamn` = p_Efternamn) THEN
+	SELECT `ProducentID` FROM `producenter` WHERE `Fornamn` = p_Fornamn AND `Efternamn` = p_Efternamn;
+ELSE
+BEGIN
+	INSERT INTO `producenter` (`Fornamn`, `Efternamn`) VALUES (p_Fornamn, p_Efternamn);
+	SELECT SCOPE_IDENTITY() AS `ProducentID`;
+END;
+END IF
+
+
+
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE
+BEGIN TRANSACTION
+    DECLARE @id AS INT;
+    SELECT @id = `ProdcentID` FROM `producenter` WHERE `Fornamn`= p_Fornamn AND `Efternamn` = p_Efternamn;
+    IF @id IS NULL
+    BEGIN
+       INSERT INTO `producenter` (`Fornamn`, `Efternamn`) VALUES (p_Fornamn, p_Efternamn);
+       SELECT @id = SCOPE_IDENTITY();
+    END
+    SELECT @id;
+COMMIT TRANSACTION
